@@ -1,17 +1,18 @@
 {
-  "name": "Farmina Product Finder",
+  "name": "Farmina App",
   "author": {
     "name": "Eduardo Wanderley",
     "email": "wanderley.eduardo@gmail.com"
   },
-  "defaultLocale": "en-US",
+  "defaultLocale": "pt-BR",
   "private": true,
   "version": "1.0.0",
   "frameworkVersion": "2.0",
   "location": {
     "support": {
       "ticket_sidebar": {
-        "url": "assets/index.html"
+        "url": "https://farmina-app.vercel.app/",
+        "flexible": true
       }
     }
   }

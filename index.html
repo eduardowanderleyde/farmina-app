@@ -313,9 +313,9 @@
       const tipoPet = form.type.value;
       const recomendacaoDiv = document.getElementById('recomendacao');
       if (tipoPet === 'dog') {
-        recomendacaoDiv.innerHTML = '<img src="assets/imgs/dog_recommend.jpeg" alt="Recomendação para cão" style="max-width:100%;margin-bottom:10px;">';
+        recomendacaoDiv.innerHTML = '<img src="imgs/dog_recommend.jpeg" alt="Recomendação para cão" style="max-width:100%;margin-bottom:10px;">';
       } else if (tipoPet === 'cat') {
-        recomendacaoDiv.innerHTML = '<img src="assets/imgs/cat_recommend.jpeg" alt="Recomendação para gato" style="max-width:100%;margin-bottom:10px;">';
+        recomendacaoDiv.innerHTML = '<img src="imgs/cat_recommend.jpeg" alt="Recomendação para gato" style="max-width:100%;margin-bottom:10px;">';
       } else {
         recomendacaoDiv.innerHTML = '';
       }
@@ -371,9 +371,9 @@
       // Atualiza a imagem de recomendação ao trocar o tipo de pet
       const recomendacaoDiv = document.getElementById('recomendacao');
       if (e.target.value === 'dog') {
-        recomendacaoDiv.innerHTML = '<img src="assets/imgs/dog_recommend.jpeg" alt="Recomendação para cão" style="max-width:100%;margin-bottom:10px;">';
+        recomendacaoDiv.innerHTML = '<img src="imgs/dog_recommend.jpeg" alt="Recomendação para cão" style="max-width:100%;margin-bottom:10px;">';
       } else if (e.target.value === 'cat') {
-        recomendacaoDiv.innerHTML = '<img src="assets/imgs/cat_recommend.jpeg" alt="Recomendação para gato" style="max-width:100%;margin-bottom:10px;">';
+        recomendacaoDiv.innerHTML = '<img src="imgs/cat_recommend.jpeg" alt="Recomendação para gato" style="max-width:100%;margin-bottom:10px;">';
       } else {
         recomendacaoDiv.innerHTML = '';
       }
@@ -382,7 +382,7 @@
     // Exibe a imagem correta ao carregar a página pela primeira vez
     document.addEventListener('DOMContentLoaded', function () {
       const recomendacaoDiv = document.getElementById('recomendacao');
-      recomendacaoDiv.innerHTML = '<img src="assets/imgs/dog_recommend.jpeg" alt="Recomendação para cão" style="max-width:100%;margin-bottom:10px;">';
+      recomendacaoDiv.innerHTML = '<img src="imgs/dog_recommend.jpeg" alt="Recomendação para cão" style="max-width:100%;margin-bottom:10px;">';
     });
 
     carregarCuidadosEspeciais();
