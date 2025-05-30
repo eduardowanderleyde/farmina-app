@@ -147,6 +147,48 @@
         text-align: center;
       }
     }
+
+    .loader {
+      display: none;
+      margin: 24px auto;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #2a7ae4;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .error-message {
+      color: #d32f2f;
+      background: #fff0f0;
+      border: 1px solid #ffcdd2;
+      border-radius: 6px;
+      padding: 10px 16px;
+      margin-bottom: 18px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .empty-message {
+      color: #555;
+      background: #f5f5f5;
+      border-radius: 6px;
+      padding: 10px 16px;
+      margin-bottom: 18px;
+      text-align: center;
+      font-weight: 500;
+    }
   </style>
   <script src="https://static.zdassets.com/zendesk_app_framework_sdk/2/zaf_sdk.js"></script>
 </head>
@@ -188,6 +230,8 @@
     </form>
 
     <div id="recomendacao"></div>
+    <div id="loader" class="loader"></div>
+    <div id="error" class="error-message" style="display:none;"></div>
     <div id="resultados"></div>
 
     <div class="brand-info">
@@ -200,36 +244,60 @@
     const user = 'wsfarmina_zendesk';
     const password = 'test';
 
+    // Função para mostrar/ocultar loader
+    function setLoading(loading) {
+      document.getElementById('loader').style.display = loading ? 'block' : 'none';
+    }
+    // Função para mostrar mensagens de erro
+    function showError(msg) {
+      const errorDiv = document.getElementById('error');
+      errorDiv.textContent = msg;
+      errorDiv.style.display = 'block';
+    }
+    function hideError() {
+      const errorDiv = document.getElementById('error');
+      errorDiv.style.display = 'none';
+    }
+
     async function carregarCuidadosEspeciais(tipoPet = 'dog') {
-      const data = await fetch('/api/farmina', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          endpoint: 'specialcares',
-          payload: {
-            species: tipoPet,
-            country: 'MA',
-            languageId: '1',
-            type: 'dietetic'
-          }
-        })
-      }).then(res => res.json());
-      const select = document.getElementById('specialcareSelect');
-      select.innerHTML = '';
-      const lista = data.result?.[0]?.specialcares?.[0]?.list || [];
-      lista.forEach(cuidado => {
-        const opt = document.createElement('option');
-        opt.value = cuidado.specialcare_id;
-        opt.textContent = cuidado.specialcare_name;
-        select.appendChild(opt);
-      });
+      setLoading(true);
+      hideError();
+      try {
+        const data = await fetch('/api/farmina', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            endpoint: 'specialcares',
+            payload: {
+              species: tipoPet,
+              country: 'MA',
+              languageId: '1',
+              type: 'dietetic'
+            }
+          })
+        }).then(res => res.json());
+        const select = document.getElementById('specialcareSelect');
+        select.innerHTML = '';
+        const lista = data.result?.[0]?.specialcares?.[0]?.list || [];
+        lista.forEach(cuidado => {
+          const opt = document.createElement('option');
+          opt.value = cuidado.specialcare_id;
+          opt.textContent = cuidado.specialcare_name;
+          select.appendChild(opt);
+        });
+      } catch (e) {
+        showError('Erro ao carregar cuidados especiais. Tente novamente.');
+      } finally {
+        setLoading(false);
+      }
     }
 
     document.getElementById('filterForm').addEventListener('submit', async e => {
       e.preventDefault();
+      hideError();
+      setLoading(true);
       const form = e.target;
       const specialcareOptions = Array.from(form.specialcares.selectedOptions).map(opt => opt.value);
-
       // Exibe a imagem de recomendação de acordo com o tipo de pet
       const tipoPet = form.type.value;
       const recomendacaoDiv = document.getElementById('recomendacao');
@@ -240,7 +308,6 @@
       } else {
         recomendacaoDiv.innerHTML = '';
       }
-
       const payload = {
         country: 'MA',
         languageId: '20',
@@ -252,37 +319,40 @@
         specialcares: specialcareOptions,
         appsAndEshop: true
       };
-
-      const data = await fetch('/api/farmina', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          endpoint: 'products',
-          payload
-        })
-      }).then(res => res.json());
-
-      const container = document.getElementById('resultados');
-      container.innerHTML = '';
-      if (!data.result?.products) {
-        container.innerHTML = '<span style="color:red;">Nenhum produto encontrado ou erro na busca.</span>';
-        return;
+      try {
+        const data = await fetch('/api/farmina', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            endpoint: 'products',
+            payload
+          })
+        }).then(res => res.json());
+        const container = document.getElementById('resultados');
+        container.innerHTML = '';
+        if (!data.result?.products || Object.keys(data.result.products).length === 0) {
+          container.innerHTML = '<div class="empty-message">Nenhum produto encontrado para os filtros selecionados.</div>';
+          return;
+        }
+        Object.values(data.result.products).forEach(prod => {
+          const div = document.createElement('div');
+          div.className = 'product';
+          div.innerHTML = `
+            <img src="${prod.img_thumbnail}" alt="${prod.name}">
+            <div class="product-info">
+              <h3>${prod.name}</h3>
+              <p><b>Linha:</b> ${prod.line || ''}</p>
+              <p>${prod.description || ''}</p>
+              <a href="${prod.url}" target="_blank">Ver produto</a>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      } catch (e) {
+        showError('Erro ao buscar produtos. Tente novamente.');
+      } finally {
+        setLoading(false);
       }
-
-      Object.values(data.result.products).forEach(prod => {
-        const div = document.createElement('div');
-        div.className = 'product';
-        div.innerHTML = `
-          <img src="${prod.img_thumbnail}" alt="${prod.name}">
-          <div class="product-info">
-            <h3>${prod.name}</h3>
-            <p><b>Linha:</b> ${prod.line || ''}</p>
-            <p>${prod.description || ''}</p>
-            <a href="${prod.url}" target="_blank">Ver produto</a>
-          </div>
-        `;
-        container.appendChild(div);
-      });
     });
 
     document.getElementById('petType').addEventListener('change', function (e) {
