@@ -1,8 +1,14 @@
 {
+  "name": {
+    "value": "Farmina App"
+  },
+  "description": {
+    "value": "Consulta de Produtos Farmina para suporte ao cliente."
+  },
   "app": {
-    "name": "Farmina Product Finder",
-    "short_description": "Quickly find Farmina products",
-    "long_description": "Find and manage Farmina products directly from your Zendesk Support.",
-    "installation_instructions": "Simply click the install button and follow the steps."
+    "name": "Farmina App",
+    "short_description": "Consulta de Produtos Farmina.",
+    "long_description": "Consulta de Produtos Farmina para suporte ao cliente.",
+    "installation_instructions": "Acesse o app Farmina na barra lateral do ticket."
   }
 } 
