@@ -6,73 +6,193 @@
   <title>Farmina - Filtro de Produtos</title>
   <style>
     body {
-      font-family: sans-serif;
-      padding: 20px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      padding: 0;
+      margin: 0;
+      background: #f7f7fa;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+      padding: 32px 24px 24px 24px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 32px;
+      font-size: 2.2rem;
+      color: #2a3b4c;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px 32px;
+      align-items: flex-end;
+      margin-bottom: 24px;
     }
 
     label {
-      display: block;
-      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      font-weight: 500;
+      color: #2a3b4c;
+      min-width: 180px;
+      margin: 0;
     }
 
     select,
     input[type="checkbox"] {
-      margin-top: 5px;
+      margin-top: 6px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #cfd8dc;
+      font-size: 1rem;
+    }
+
+    select[multiple] {
+      min-height: 60px;
+    }
+
+    button[type="submit"] {
+      background: #2a7ae4;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 22px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 18px;
+      transition: background 0.2s;
+    }
+
+    button[type="submit"]:hover {
+      background: #1856a7;
+    }
+
+    #recomendacao {
+      text-align: center;
+      margin-bottom: 24px;
     }
 
     .product {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-top: 10px;
+      background: #f9fafb;
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+      padding: 18px 18px 18px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
     }
 
-    img {
-      max-width: 100px;
+    .product img {
+      max-width: 120px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .product-info {
+      flex: 1;
+    }
+
+    .product h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.2rem;
+      color: #2a3b4c;
+    }
+
+    .product p {
+      margin: 0 0 8px 0;
+      color: #444;
+      font-size: 1rem;
+    }
+
+    .product a {
+      color: #2a7ae4;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+
+    .brand-info {
+      margin-top: 16px;
+      color: #555;
+      text-align: right;
+      font-size: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 12px 4px;
+      }
+
+      form {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .product {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand-info {
+        text-align: center;
+      }
     }
   </style>
   <script src="https://static.zdassets.com/zendesk_app_framework_sdk/2/zaf_sdk.js"></script>
 </head>
 
 <body>
-  <h1>Consulta de Produtos Farmina</h1>
-  <form id="filterForm">
-    <label>Tipo de alimento:
-      <select name="productType">
-        <option value="dry">Seco</option>
-        <option value="wet">Molhado</option>
-      </select>
-    </label>
+  <div class="container">
+    <h1>Consulta de Produtos Farmina</h1>
+    <form id="filterForm">
+      <label>Tipo de alimento:
+        <select name="productType">
+          <option value="dry">Seco</option>
+          <option value="wet">Molhado</option>
+        </select>
+      </label>
 
-    <label>Tipo de pet:
-      <select name="type" id="petType">
-        <option value="dog">Cão</option>
-        <option value="cat">Gato</option>
-      </select>
-    </label>
+      <label>Tipo de pet:
+        <select name="type" id="petType">
+          <option value="dog">Cão</option>
+          <option value="cat">Gato</option>
+        </select>
+      </label>
 
-    <label><input type="checkbox" name="gestation"> Gestação</label>
-    <label><input type="checkbox" name="lactation"> Lactação</label>
+      <label><input type="checkbox" name="gestation"> Gestação</label>
+      <label><input type="checkbox" name="lactation"> Lactação</label>
 
-    <label>Fase da vida:
-      <select name="lifeStage">
-        <option value="puppy">Filhote</option>
-        <option value="adult">Adulto</option>
-        <option value="senior">Sênior</option>
-      </select>
-    </label>
+      <label>Fase da vida:
+        <select name="lifeStage">
+          <option value="puppy">Filhote</option>
+          <option value="adult">Adulto</option>
+          <option value="senior">Sênior</option>
+        </select>
+      </label>
 
-    <label>Cuidados especiais:
-      <select name="specialcares" multiple id="specialcareSelect"></select>
-    </label>
+      <label>Cuidados especiais:
+        <select name="specialcares" multiple id="specialcareSelect"></select>
+      </label>
 
-    <button type="submit">Buscar produtos</button>
-  </form>
+      <button type="submit">Buscar produtos</button>
+    </form>
 
-  <div id="recomendacao"></div>
-  <div id="resultados"></div>
+    <div id="recomendacao"></div>
+    <div id="resultados"></div>
 
-  <div class="brand-info" style="margin-top: 16px; color: #555;">
-    <b>Brand (countryId) usado na busca:</b> MA
+    <div class="brand-info">
+      <b>Brand (countryId) usado na busca:</b> MA
+    </div>
   </div>
 
   <script>
@@ -153,11 +273,13 @@
         const div = document.createElement('div');
         div.className = 'product';
         div.innerHTML = `
-          <h3>${prod.name}</h3>
           <img src="${prod.img_thumbnail}" alt="${prod.name}">
-          <p><b>Linha:</b> ${prod.line || ''}</p>
-          <p>${prod.description || ''}</p>
-          <a href="${prod.url}" target="_blank">Ver produto</a>
+          <div class="product-info">
+            <h3>${prod.name}</h3>
+            <p><b>Linha:</b> ${prod.line || ''}</p>
+            <p>${prod.description || ''}</p>
+            <a href="${prod.url}" target="_blank">Ver produto</a>
+          </div>
         `;
         container.appendChild(div);
       });
