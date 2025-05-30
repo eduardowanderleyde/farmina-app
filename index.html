@@ -81,23 +81,22 @@
     const password = 'test';
 
     async function carregarCuidadosEspeciais(tipoPet = 'dog') {
-      const data = await client.request({
-        url: 'https://gw-c.petgenius.info/wfservice/z1/specialcares/list',
-        type: 'POST',
-        contentType: 'application/json',
-        headers: {
-          Authorization: 'Basic ' + btoa(`${user}:${password}`)
-        },
-        data: JSON.stringify({
-          species: tipoPet,
-          country: 'MA',
-          languageId: '1',
-          type: 'dietetic'
+      const data = await fetch('/api/farmina', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          endpoint: 'specialcares',
+          payload: {
+            species: tipoPet,
+            country: 'MA',
+            languageId: '1',
+            type: 'dietetic'
+          }
         })
-      });
+      }).then(res => res.json());
       const select = document.getElementById('specialcareSelect');
       select.innerHTML = '';
-      const lista = data.result[0]?.specialcares[0]?.list || [];
+      const lista = data.result?.[0]?.specialcares?.[0]?.list || [];
       lista.forEach(cuidado => {
         const opt = document.createElement('option');
         opt.value = cuidado.specialcare_id;
@@ -134,15 +133,14 @@
         appsAndEshop: true
       };
 
-      const data = await client.request({
-        url: 'https://gw-c.petgenius.info/wfservice/z1/nutritionalplans/products/list',
-        type: 'POST',
-        contentType: 'application/json',
-        headers: {
-          Authorization: 'Basic ' + btoa(`${user}:${password}`)
-        },
-        data: JSON.stringify(payload)
-      });
+      const data = await fetch('/api/farmina', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          endpoint: 'products',
+          payload
+        })
+      }).then(res => res.json());
 
       const container = document.getElementById('resultados');
       container.innerHTML = '';
