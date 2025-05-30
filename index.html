@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Farmina - Filtro de Produtos</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    select,
+    input[type="checkbox"] {
+      margin-top: 5px;
+    }
+
+    .product {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    img {
+      max-width: 100px;
+    }
+  </style>
+  <script src="https://static.zdassets.com/zendesk_app_framework_sdk/2/zaf_sdk.js"></script>
+</head>
+
+<body>
+  <h1>Consulta de Produtos Farmina</h1>
+  <form id="filterForm">
+    <label>Tipo de alimento:
+      <select name="productType">
+        <option value="dry">Seco</option>
+        <option value="wet">Molhado</option>
+      </select>
+    </label>
+
+    <label>Tipo de pet:
+      <select name="type" id="petType">
+        <option value="dog">Cão</option>
+        <option value="cat">Gato</option>
+      </select>
+    </label>
+
+    <label><input type="checkbox" name="gestation"> Gestação</label>
+    <label><input type="checkbox" name="lactation"> Lactação</label>
+
+    <label>Fase da vida:
+      <select name="lifeStage">
+        <option value="puppy">Filhote</option>
+        <option value="adult">Adulto</option>
+        <option value="senior">Sênior</option>
+      </select>
+    </label>
+
+    <label>Cuidados especiais:
+      <select name="specialcares" multiple id="specialcareSelect"></select>
+    </label>
+
+    <button type="submit">Buscar produtos</button>
+  </form>
+
+  <div id="recomendacao"></div>
+  <div id="resultados"></div>
+
+  <div class="brand-info" style="margin-top: 16px; color: #555;">
+    <b>Brand (countryId) usado na busca:</b> MA
+  </div>
+
+  <script>
+    const client = ZAFClient.init();
+    const user = 'wsfarmina_zendesk';
+    const password = 'test';
+
+    async function carregarCuidadosEspeciais(tipoPet = 'dog') {
+      const data = await client.request({
+        url: 'https://gw-c.petgenius.info/wfservice/z1/specialcares/list',
+        type: 'POST',
+        contentType: 'application/json',
+        headers: {
+          Authorization: 'Basic ' + btoa(`${user}:${password}`)
+        },
+        data: JSON.stringify({
+          species: tipoPet,
+          country: 'MA',
+          languageId: '1',
+          type: 'dietetic'
+        })
+      });
+      const select = document.getElementById('specialcareSelect');
+      select.innerHTML = '';
+      const lista = data.result[0]?.specialcares[0]?.list || [];
+      lista.forEach(cuidado => {
+        const opt = document.createElement('option');
+        opt.value = cuidado.specialcare_id;
+        opt.textContent = cuidado.specialcare_name;
+        select.appendChild(opt);
+      });
+    }
+
+    document.getElementById('filterForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const form = e.target;
+      const specialcareOptions = Array.from(form.specialcares.selectedOptions).map(opt => opt.value);
+
+      // Exibe a imagem de recomendação de acordo com o tipo de pet
+      const tipoPet = form.type.value;
+      const recomendacaoDiv = document.getElementById('recomendacao');
+      if (tipoPet === 'dog') {
+        recomendacaoDiv.innerHTML = '<img src="assets/imgs/dog_recommend.jpeg" alt="Recomendação para cão" style="max-width:100%;margin-bottom:10px;">';
+      } else if (tipoPet === 'cat') {
+        recomendacaoDiv.innerHTML = '<img src="assets/imgs/cat_recommend.jpeg" alt="Recomendação para gato" style="max-width:100%;margin-bottom:10px;">';
+      } else {
+        recomendacaoDiv.innerHTML = '';
+      }
+
+      const payload = {
+        country: 'MA',
+        languageId: '20',
+        productType: form.productType.value,
+        type: form.type.value,
+        lifeStage: form.lifeStage.value,
+        gestation: form.gestation.checked,
+        lactation: form.lactation.checked,
+        specialcares: specialcareOptions,
+        appsAndEshop: true
+      };
+
+      const data = await client.request({
+        url: 'https://gw-c.petgenius.info/wfservice/z1/nutritionalplans/products/list',
+        type: 'POST',
+        contentType: 'application/json',
+        headers: {
+          Authorization: 'Basic ' + btoa(`${user}:${password}`)
+        },
+        data: JSON.stringify(payload)
+      });
+
+      const container = document.getElementById('resultados');
+      container.innerHTML = '';
+      if (!data.result?.products) {
+        container.innerHTML = '<span style="color:red;">Nenhum produto encontrado ou erro na busca.</span>';
+        return;
+      }
+
+      Object.values(data.result.products).forEach(prod => {
+        const div = document.createElement('div');
+        div.className = 'product';
+        div.innerHTML = `
+          <h3>${prod.name}</h3>
+          <img src="${prod.img_thumbnail}" alt="${prod.name}">
+          <p><b>Linha:</b> ${prod.line || ''}</p>
+          <p>${prod.description || ''}</p>
+          <a href="${prod.url}" target="_blank">Ver produto</a>
+        `;
+        container.appendChild(div);
+      });
+    });
+
+    document.getElementById('petType').addEventListener('change', function (e) {
+      carregarCuidadosEspeciais(e.target.value);
+      // Atualiza a imagem de recomendação ao trocar o tipo de pet
+      const recomendacaoDiv = document.getElementById('recomendacao');
+      if (e.target.value === 'dog') {
+        recomendacaoDiv.innerHTML = '<img src="assets/imgs/dog_recommend.jpeg" alt="Recomendação para cão" style="max-width:100%;margin-bottom:10px;">';
+      } else if (e.target.value === 'cat') {
+        recomendacaoDiv.innerHTML = '<img src="assets/imgs/cat_recommend.jpeg" alt="Recomendação para gato" style="max-width:100%;margin-bottom:10px;">';
+      } else {
+        recomendacaoDiv.innerHTML = '';
+      }
+    });
+
+    // Exibe a imagem correta ao carregar a página pela primeira vez
+    document.addEventListener('DOMContentLoaded', function () {
+      const recomendacaoDiv = document.getElementById('recomendacao');
+      recomendacaoDiv.innerHTML = '<img src="assets/imgs/dog_recommend.jpeg" alt="Recomendação para cão" style="max-width:100%;margin-bottom:10px;">';
+    });
+
+    carregarCuidadosEspeciais();
+  </script>
+</body>
+
+</html>
