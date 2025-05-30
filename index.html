@@ -36,6 +36,14 @@
       margin-bottom: 24px;
     }
 
+    .row-checkboxes {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      margin-top: 6px;
+      margin-bottom: 0;
+    }
+
     label {
       display: flex;
       flex-direction: column;
@@ -69,6 +77,7 @@
       cursor: pointer;
       margin-top: 18px;
       transition: background 0.2s;
+      align-self: flex-end;
     }
 
     button[type="submit"]:hover {
@@ -211,8 +220,10 @@
         </select>
       </label>
 
-      <label><input type="checkbox" name="gestation"> Gestação</label>
-      <label><input type="checkbox" name="lactation"> Lactação</label>
+      <div class="row-checkboxes">
+        <label style="margin:0;"><input type="checkbox" name="gestation"> Gestação</label>
+        <label style="margin:0;"><input type="checkbox" name="lactation"> Lactação</label>
+      </div>
 
       <label>Fase da vida:
         <select name="lifeStage">
